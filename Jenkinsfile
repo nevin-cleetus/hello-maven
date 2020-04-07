@@ -25,30 +25,13 @@ pipeline {
                 sh 'mvn clean package test'
             }         
         }    
-	
-       /*stage('Test') {
-            agent {
-               docker {
-                   image 'maven:3-alpine'
-                   args '-v /root/.m2:/root/.m2'
-               }
-            }
-            steps {
-                sh 'mvn clean test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-       }*/
 	    
-      stage('Building image') {
-          steps{
-              script {
-                  dockerImage = docker.build registry + ":$BUILD_NUMBER"
-              }
-          }
-      }	 
+        stage('Building image') {
+           steps{
+               script {
+                   dockerImage = docker.build registry + ":$BUILD_NUMBER"
+               }
+           }
+        }	 
     }	
 }
