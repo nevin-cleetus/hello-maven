@@ -1,17 +1,33 @@
 pipeline {
     
     agent any
-	
-    
+
     environment
     {        
 	registry = "nevincleetus/helloworld-repo"
         registryCredential = 'dockerhub'
         dockerImage = ''  
-    }	
+    }		
+    tools { 
+        maven 'M2_HOME'         
+    }		
     stages {
+	    
+	stage ('Initialize') {
+            steps {
+                sh '''
+                    echo "PATH = ${PATH}"
+                    echo "M2_HOME = ${M2_HOME}"
+                '''
+            }
+        }	
+	stage ('Build') {
+            steps {
+                sh 'mvn clean package'
+            }         
+        }    
 	
-    	stage('Build') {
+    	/*stage('Build') {
           agent {
             docker {
                image 'maven:3-alpine'
@@ -21,7 +37,7 @@ pipeline {
 
           steps {
                 sh 'mvn clean package'
-          }
+          }*/
        }
        stage('Test') {
             agent {
