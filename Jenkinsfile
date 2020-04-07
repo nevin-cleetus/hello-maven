@@ -1,37 +1,54 @@
 pipeline {
-    
     agent any
-
-    environment
-    {        
-	registry = "nevincleetus/helloworld-repo"
-        registryCredential = 'dockerhub'
-        dockerImage = ''  
-    }		
-    tools { 
-        maven 'M2_HOME'         
-    }		
-    stages {	    
-	stage ('Initialize') {
+    stages {
+        stage ('Clone') {
             steps {
-                sh '''
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                '''
+                git branch: 'master', url: "https://github.com/nevin-cleetus/hello-maven.git"
             }
-        }	
-	stage ('Build') {
+        }
+
+        stage ('Artifactory configuration') {
             steps {
-                sh 'mvn clean package test'
-            }         
-        }    
-	    
-        stage('Building image') {
-           steps{
-               script {
-                   dockerImage = docker.build registry + ":$BUILD_NUMBER"
-               }
-           }
-        }	 
-    }	
+                rtServer (
+                    id: "ARTIFACTORY_ID",
+                    url: SERVER_URL,
+                    credentialsId: CREDENTIALS
+                )
+
+                rtMavenDeployer (
+                    id: "MAVEN_DEPLOYER",
+                    serverId: "ARTIFACTORY_SERVER",
+                    releaseRepo: "libs-release-local",
+                    snapshotRepo: "libs-snapshot-local"
+                )
+
+                rtMavenResolver (
+                    id: "MAVEN_RESOLVER",
+                    serverId: "ARTIFACTORY_SERVER",
+                    releaseRepo: "libs-release",
+                    snapshotRepo: "libs-snapshot"
+                )
+            }
+        }
+
+        stage ('Exec Maven') {
+            steps {
+                rtMavenRun (
+                    tool: MAVEN_TOOL, // Tool name from Jenkins configuration
+                    pom: 'maven-example/pom.xml',
+                    goals: 'clean install',
+                    deployerId: "MAVEN_DEPLOYER",
+                    resolverId: "MAVEN_RESOLVER"
+                )
+            }
+        }
+
+        stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "ARTIFACTORY_ID"
+                )
+            }
+        }
+    }
 }
