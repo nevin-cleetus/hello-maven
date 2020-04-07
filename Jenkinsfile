@@ -22,11 +22,11 @@ pipeline {
         }	
 	stage ('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package test'
             }         
         }    
 	
-       stage('Test') {
+       /*stage('Test') {
             agent {
                docker {
                    image 'maven:3-alpine'
@@ -41,7 +41,7 @@ pipeline {
                     junit 'target/surefire-reports/*.xml'
                 }
             }
-       }
+       }*/
 	    
       stage('Building image') {
           steps{
