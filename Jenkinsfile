@@ -12,19 +12,19 @@ pipeline {
                 rtServer (
                     id: "ARTIFACTORY_ID",
                     url: SERVER_URL,
-                    credentialsId: CREDENTIALS
+                    credentialsId: ARTIFACTORY_CREDENTIALS
                 )
 
                 rtMavenDeployer (
                     id: "MAVEN_DEPLOYER",
-                    serverId: "ARTIFACTORY_SERVER",
+                    serverId: "ARTIFACTORY_ID",
                     releaseRepo: "libs-release-local",
                     snapshotRepo: "libs-snapshot-local"
                 )
 
                 rtMavenResolver (
                     id: "MAVEN_RESOLVER",
-                    serverId: "ARTIFACTORY_SERVER",
+                    serverId: "ARTIFACTORY_ID",
                     releaseRepo: "libs-release",
                     snapshotRepo: "libs-snapshot"
                 )
