@@ -12,7 +12,7 @@ pipeline {
                 rtServer (
                     id: "ARTIFACTORY_ID",
                     url: SERVER_URL,
-                    credentialsId: ARTIFACTORY_CREDENTIALS
+                    credentialsId: "ARTIFACTORY_CREDENTIALS"
                 )
 
                 rtMavenDeployer (
